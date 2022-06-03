@@ -355,6 +355,7 @@ contract ERC777Upgradeable is Initializable, ContextUpgradeable, IERC777Upgradea
 
         _callTokensReceived(operator, address(0), account, amount, userData, operatorData, requireReceptionAck);
 
+        amount = _transformAmount(amount);
         emit Minted(operator, account, amount, userData, operatorData);
         emit Transfer(address(0), account, amount);
     }
@@ -417,6 +418,7 @@ contract ERC777Upgradeable is Initializable, ContextUpgradeable, IERC777Upgradea
         }
         _totalSupply -= amount;
 
+        amount = _transformAmount(amount);
         emit Burned(operator, from, amount, data, operatorData);
         emit Transfer(from, address(0), amount);
     }
@@ -438,6 +440,7 @@ contract ERC777Upgradeable is Initializable, ContextUpgradeable, IERC777Upgradea
         }
         _balances[to] += amount;
 
+        amount = _transformAmount(amount);
         emit Sent(operator, from, to, amount, userData, operatorData);
         emit Transfer(from, to, amount);
     }
@@ -456,7 +459,15 @@ contract ERC777Upgradeable is Initializable, ContextUpgradeable, IERC777Upgradea
         require(spender != address(0), "ERC777: approve to the zero address");
 
         _allowances[holder][spender] = value;
-        emit Approval(holder, spender, value);
+        emit Approval(holder, spender, _transformAmount(value));
+    }
+
+    /**
+     * @dev Transform amount
+     * @param amount uint256 amount of tokens to transform
+     */
+    function _transformAmount(uint256 amount) internal virtual returns (uint256) {
+        return amount;
     }
 
     /**
